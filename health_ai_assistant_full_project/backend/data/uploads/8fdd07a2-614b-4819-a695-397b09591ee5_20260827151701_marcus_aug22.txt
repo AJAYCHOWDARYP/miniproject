@@ -1,0 +1,9 @@
+LABORATORY DIAGNOSTIC REPORT
+Patient Name: Marcus Kane
+Age: 51 Years | Gender: Male | Weight: 83.2 kg
+Date: 2026-08-22
+Doctor: Dr. Sarah Jenkins
+
+Total Cholesterol: 205.0 mg/dL (125.0 - 200.0 mg/dL)
+Triglycerides: 165.0 mg/dL (0.0 - 150.0 mg/dL)
+Serum Creatinine: 1.0 mg/dL (0.6 - 1.2 mg/dL)
