@@ -1,4 +1,18 @@
 // ==========================================
+// GLOBAL APPLICATION STATE
+// ==========================================
+var currentTab = "dashboard";
+var currentSelectedPatient = null;
+var authToken = localStorage.getItem("health_auth_token") || null;
+var currentActiveReportData = null;
+var pendingReportId = null;
+var reportToDeleteId = null;
+var trendChartInstance = null;
+var allReportsCache = [];
+var allTrendsData = null;
+var currentUserData = null;
+
+// ==========================================
 // REAL-TIME NOTIFICATIONS & TOAST ENGINE
 // ==========================================
 
@@ -343,20 +357,20 @@ function selectPatientFilter(patientName) {
   }
 }
 
-let currentSelectedPatient = null;
+
 /**
  * Frontend Controller for Personalized, Report-Driven Healthcare Assistant.
  * Built with clear, friendly, everyday language across all 10 views.
  */
 
-let authToken = localStorage.getItem("health_auth_token") || null;
-let currentActiveReportData = null;
-let pendingReportId = null;
-let reportToDeleteId = null;
-let trendChartInstance = null;
-let allReportsCache = [];
-let allTrendsData = null;
-let currentUserData = null;
+
+
+
+
+
+
+
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   setupDragAndDrop();
