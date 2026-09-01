@@ -1,16 +1,18 @@
 """
 Database engine and async session provider.
-Optimized for Serverless Execution.
+Optimized for Serverless Execution with NullPool to prevent Lambda thread freeze crashes.
 """
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.pool import NullPool
 from app.core.config import settings
 
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=False,
     future=True,
+    poolclass=NullPool,
     connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
 )
 
