@@ -693,9 +693,8 @@ async function uploadSelectedFile(file) {
   formData.append("report_type", "Laboratory Report");
 
   try {
-    const res = await fetch("/api/v1/reports/upload", {
+    const res = await fetchWithAuth("/api/v1/reports/upload", {
       method: "POST",
-      headers: { "Authorization": `Bearer ${authToken}` },
       body: formData
     });
 
