@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+data/uploads/*
+data/encrypted_storage/*
+data/*.db
+.env
+.venv
+env/
+venv/
+tests/
