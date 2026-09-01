@@ -3,7 +3,7 @@ Pydantic Schemas for Authentication, Profiles, Reports, Medications, Assistant, 
 """
 from typing import List, Optional, Dict, Any
 from datetime import date, datetime
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, ConfigDict
 
 
 class UserCreate(BaseModel):
@@ -175,7 +175,7 @@ class ChatMessageOut(BaseModel):
 
 
 class DoctorShareRequest(BaseModel):
-    recipient_email: Optional[EmailStr] = None
+    recipient_email: Optional[str] = None
     recipient_name: Optional[str] = None
     share_duration_days: int = 7
     include_reports: bool = True
