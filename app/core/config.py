@@ -12,14 +12,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 IS_SERVERLESS = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or os.getenv("SERVERLESS"))
 
 if IS_SERVERLESS:
-    DATA_DIR = Path("/tmp") / "data"
+    DATA_DIR = Path("/tmp")
 else:
     DATA_DIR = BASE_DIR / "data"
 
 try:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 except Exception:
-    DATA_DIR = Path("/tmp") / "data"
+    DATA_DIR = Path("/tmp")
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 UPLOAD_DIR = DATA_DIR / "uploads"
@@ -58,13 +58,23 @@ class Settings(BaseModel):
         "difficulty breathing", "severe shortness of breath", "gasping for air", "choking",
         "stroke", "facial drooping", "slurred speech", "sudden paralysis", "arm weakness",
         "sudden loss of vision", "worst headache of my life", "thunderclap headache",
-        "coughing up blood", "vomiting blood", "severe hemorrhage", "uncontrolled bleeding",
-        "suicidal", "kill myself", "end my life", "anaphylaxis", "throat swelling", "blue lips",
-        "unconscious", "passed out", "seizure", "unresponsive"
+        "unresponsive", "passed out", "unconscious", "cannot wake up", "seizure",
+        "severe allergic reaction", "anaphylaxis", "throat closing", "swollen tongue",
+        "coughing up blood", "severe hemorrhage", "profuse bleeding", "spurting blood",
+        "suicidal", "want to kill myself", "end my life", "overdose", "poisoning"
     ]
     
-    GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", None)
-    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY", None)
+    # Medication Safety Refusal Keywords
+    PRESCRIPTION_KEYWORDS: List[str] = [
+        "prescribe", "what medicine should i take", "what dosage", "should i increase my dose",
+        "should i stop taking", "give me a prescription", "recommend antibiotic", "what pills to take"
+    ]
+    
+    # Diagnostic Refusal Keywords
+    DIAGNOSIS_KEYWORDS: List[str] = [
+        "what disease do i have", "diagnose me", "do i have cancer", "do i have diabetes",
+        "tell me my condition", "is this tumor malignant", "what illness is this"
+    ]
 
 
 settings = Settings()

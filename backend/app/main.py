@@ -7,7 +7,7 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -67,9 +67,8 @@ async def init_clean_auth_account():
                 )
                 db.add(profile)
                 await db.commit()
-                print("[INFO] Clean Patient Account initialized with ZERO hardcoded medical reports.")
     except Exception as e:
-        print(f"[INFO] Auth initialization note: {e}")
+        print(f"[INFO] Auth note: {e}")
 
 
 @asynccontextmanager
@@ -79,7 +78,7 @@ async def lifespan(app: FastAPI):
             await conn.run_sync(Base.metadata.create_all)
         await init_clean_auth_account()
     except Exception as e:
-        print(f"[INFO] DB startup note: {e}")
+        print(f"[INFO] Startup note: {e}")
     yield
     try:
         await engine.dispose()
@@ -113,10 +112,28 @@ if STATIC_DIR and STATIC_DIR.exists():
 
 @app.get("/")
 async def root_index():
-    if STATIC_DIR and (STATIC_DIR / "index.html").exists():
-        content = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
-        return HTMLResponse(content=content, media_type="text/html")
+    for p in possible_static_paths:
+        if p.exists() and (p / "index.html").exists():
+            return HTMLResponse(content=(p / "index.html").read_text(encoding="utf-8"), media_type="text/html")
     return {"message": "Personalized Healthcare AI Assistant API is active.", "docs": "/docs"}
+
+
+@app.get("/styles.css")
+@app.get("/static/styles.css")
+async def get_styles():
+    for p in possible_static_paths:
+        if p.exists() and (p / "styles.css").exists():
+            return Response(content=(p / "styles.css").read_text(encoding="utf-8"), media_type="text/css")
+    return Response(content="", media_type="text/css")
+
+
+@app.get("/app.js")
+@app.get("/static/app.js")
+async def get_js():
+    for p in possible_static_paths:
+        if p.exists() and (p / "app.js").exists():
+            return Response(content=(p / "app.js").read_text(encoding="utf-8"), media_type="application/javascript")
+    return Response(content="", media_type="application/javascript")
 
 
 @app.get("/health")
