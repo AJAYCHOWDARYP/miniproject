@@ -5,9 +5,7 @@ echo  Repository: https://github.com/AJAYCHOWDARYP/miniproject.git
 echo =======================================================
 echo.
 cd /d "%~dp0"
-"C:\Users\ajayk\.gemini\antigravity\scratch\mingit\cmd\git.exe" add .
-"C:\Users\ajayk\.gemini\antigravity\scratch\mingit\cmd\git.exe" commit -m "fix: updated vercel python builder configuration"
-"C:\Users\ajayk\.gemini\antigravity\scratch\mingit\cmd\git.exe" push --force -u origin main
+"C:\Users\ajayk\.gemini\antigravity\scratch\mingit\cmd\git.exe" push -u origin main
 echo.
 echo =======================================================
 if %ERRORLEVEL% EQU 0 (
