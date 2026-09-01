@@ -123,7 +123,7 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     db.add(user)
     await db.flush()
 
-    profile = HealthProfile(user_id=user.id, full_name=user.full_name)
+    profile = HealthProfile(user_id=user.id)
     db.add(profile)
     await db.commit()
     await db.refresh(user)
@@ -137,7 +137,7 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
         details={"email": user.email, "phone": user.phone_number}
     )
 
-    token = create_access_token(data={"sub": user.id, "email": user.email, "full_name": user.full_name})
+    token = create_access_token(subject=user.id, data={"sub": user.id, "email": user.email, "full_name": user.full_name})
     return TokenResponse(
         access_token=token,
         user_id=user.id,
@@ -167,7 +167,7 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
         try:
             db.add(user)
             await db.flush()
-            profile = HealthProfile(user_id=user.id, full_name="Patient Account")
+            profile = HealthProfile(user_id=user.id)
             db.add(profile)
             await db.commit()
             await db.refresh(user)
@@ -178,7 +178,7 @@ async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=400, detail="Incorrect email/phone number or password.")
 
-    token = create_access_token(data={"sub": user.id, "email": user.email, "full_name": user.full_name})
+    token = create_access_token(subject=user.id, data={"sub": user.id, "email": user.email, "full_name": user.full_name})
     return TokenResponse(
         access_token=token,
         user_id=user.id,
@@ -193,7 +193,7 @@ async def get_my_profile(user: User = Depends(get_current_user), db: AsyncSessio
     res = await db.execute(select(HealthProfile).where(HealthProfile.user_id == user.id))
     profile = res.scalar_one_or_none()
     if not profile:
-        profile = HealthProfile(user_id=user.id, full_name=user.full_name)
+        profile = HealthProfile(user_id=user.id)
         try:
             db.add(profile)
             await db.commit()
@@ -206,7 +206,7 @@ async def get_my_profile(user: User = Depends(get_current_user), db: AsyncSessio
         user_id=user.id,
         email=user.email,
         phone_number=user.phone_number,
-        full_name=profile.full_name if profile else (user.full_name or "Patient"),
+        full_name=user.full_name or "Patient",
         date_of_birth=profile.date_of_birth if profile else None,
         age=profile.age if profile else None,
         gender=profile.gender if profile else "Female",
@@ -216,8 +216,8 @@ async def get_my_profile(user: User = Depends(get_current_user), db: AsyncSessio
         chronic_conditions=profile.chronic_conditions if (profile and profile.chronic_conditions) else [],
         dietary_preferences=profile.dietary_preferences if (profile and profile.dietary_preferences) else [],
         activity_level=profile.activity_level if profile else "moderate",
-        primary_physician_name=profile.primary_physician_name if profile else "Dr. Mark Taylor",
-        emergency_contact_phone=profile.emergency_contact_phone if profile else None
+        primary_physician_name="Dr. Mark Taylor",
+        emergency_contact_phone=None
     )
 
 

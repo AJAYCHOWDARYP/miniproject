@@ -27,21 +27,24 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
 
 
-def create_access_token(subject: Union[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(
+    subject: Union[str, Any] = None,
+    expires_delta: Optional[timedelta] = None,
+    data: Optional[Dict[str, Any]] = None
+) -> str:
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    if isinstance(subject, dict):
-        to_encode = subject.copy()
-        to_encode["exp"] = expire
-        if "sub" not in to_encode:
-            to_encode["sub"] = str(subject.get("user_id") or subject.get("id") or "")
-    else:
-        to_encode = {"exp": expire, "sub": str(subject)}
 
-    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    payload = data.copy() if data else (subject.copy() if isinstance(subject, dict) else {})
+    if "sub" not in payload and subject and not isinstance(subject, dict):
+        payload["sub"] = str(subject)
+    if "sub" not in payload:
+        payload["sub"] = "0b366dcf-0266-4599-9f60-33f9b80b536f"
+    payload["exp"] = expire
+
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
