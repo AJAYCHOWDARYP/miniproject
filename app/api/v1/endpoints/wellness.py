@@ -236,6 +236,7 @@ async def log_meal(payload: MealLogCreate, user: User = Depends(get_current_user
     return {"message": "Meal logged successfully", "log": mlog}
 
 
+@router.get("/dashboard")
 @router.get("/dashboard-summary")
 async def get_dashboard_summary(
     patient_name: Optional[str] = Query(None),
