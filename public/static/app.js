@@ -1,3 +1,18 @@
+// Universal resilient fetch with auto-login on 401
+async function fetchWithAuth(url, options = {}) {
+  if (!options.headers) options.headers = {};
+  if (authToken) options.headers["Authorization"] = `Bearer ${authToken}`;
+  
+  let res = await fetch(url, options);
+  if (res.status === 401) {
+    await autoLoginDemo();
+    if (authToken) {
+      options.headers["Authorization"] = `Bearer ${authToken}`;
+      res = await fetch(url, options);
+    }
+  }
+  return res;
+}
 // ==========================================
 // GLOBAL APPLICATION STATE
 // ==========================================
@@ -225,7 +240,7 @@ function startBackgroundReminderChecker() {
       const curTimeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${ampm}`;
 
       // Check against meal reminders
-      const mealRes = await fetch("/api/v1/wellness/reminders/diet", { headers: { "Authorization": `Bearer ${authToken}` } });
+      const mealRes = await fetchWithAuth("/api/v1/wellness/reminders/diet");
       if (mealRes.ok) {
         const meals = await mealRes.json();
         meals.forEach(m => {
@@ -906,7 +921,7 @@ async function render14StepAnalysis(data) {
   // STEP 8: PREVIOUS REPORT COMPARISON
   const prevContainer = document.getElementById("seq8ComparisonContainer");
   try {
-    const histRes = await fetch("/api/v1/reports/", { headers: { "Authorization": `Bearer ${authToken}` } });
+    const histRes = await fetchWithAuth("/api/v1/reports/");
     if (histRes.ok) {
       const histReports = await histRes.json();
       const otherReports = histReports.filter(r => r.id !== data.report_id);
@@ -1299,8 +1314,8 @@ async function loadDashboard() {
   if (!authToken) await autoLoginDemo();
   try {
     const [dashRes, repRes] = await Promise.all([
-      fetch("/api/v1/wellness/dashboard-summary", { headers: { "Authorization": `Bearer ${authToken}` } }),
-      fetch("/api/v1/reports/", { headers: { "Authorization": `Bearer ${authToken}` } })
+      fetchWithAuth("/api/v1/wellness/dashboard-summary"),
+      fetchWithAuth("/api/v1/reports/")
     ]);
 
     const container = document.getElementById("dashboardDynamicContent");
@@ -1662,7 +1677,7 @@ function closeComparisonModal() {
 // Health Trends Loader
 async function loadTrends() {
   try {
-    const res = await fetch("/api/v1/trends/biomarkers", { headers: { "Authorization": `Bearer ${authToken}` } });
+    const res = await fetchWithAuth("/api/v1/trends/biomarkers");
     if (!res.ok) return;
 
     const data = await res.json();
@@ -2152,9 +2167,9 @@ async function loadDiet() {
 async function loadNotificationsView() {
   try {
     const [mealRes, medRes, moveRes] = await Promise.all([
-      fetch("/api/v1/wellness/reminders/diet", { headers: { "Authorization": `Bearer ${authToken}` } }),
+      fetchWithAuth("/api/v1/wellness/reminders/diet"),
       fetch("/api/v1/medications/", { headers: { "Authorization": `Bearer ${authToken}` } }),
-      fetch("/api/v1/wellness/reminders/movement", { headers: { "Authorization": `Bearer ${authToken}` } })
+      fetchWithAuth("/api/v1/wellness/reminders/movement")
     ]);
 
     if (mealRes.ok) {
