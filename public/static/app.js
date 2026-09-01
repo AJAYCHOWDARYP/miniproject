@@ -227,7 +227,10 @@ async function saveMovementReminder() {
 }
 
 // Background Reminder Checker - checks every 30 seconds
+let _reminderCheckerStarted = false;
 function startBackgroundReminderChecker() {
+  if (_reminderCheckerStarted) return;
+  _reminderCheckerStarted = true;
   setInterval(async () => {
     if (!authToken) return;
     try {
@@ -278,8 +281,7 @@ function setDashboardTheme(themeName) {
 
   if (currentTab === 'dashboard') {
     loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
   }
 }
 
@@ -367,8 +369,7 @@ function selectPatientFilter(patientName) {
     loadBiomarkerTrends();
   } else if (currentTab === "dashboard") {
     loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
   }
 }
 
@@ -391,8 +392,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupDragAndDrop();
   await initAuthSession();
   await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
   lucide.createIcons();
 });
 
@@ -514,8 +514,7 @@ async function handleUserLogin() {
       closeAuthModal();
       updateHeaderUserDisplay();
       await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
       alert(`✓ Welcome back, ${data.full_name || 'Patient'}!`);
     } else {
       const err = await res.json();
@@ -573,8 +572,7 @@ async function handleUserRegister() {
       closeAuthModal();
       updateHeaderUserDisplay();
       await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
       alert(`✓ Account created successfully! Welcome, ${data.full_name || 'Patient'}!`);
     } else {
       const err = await res.json();
@@ -596,8 +594,7 @@ async function handleDemoQuickLogin() {
   await autoLoginDemo();
   closeAuthModal();
   await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
   alert("✓ Switched to Demo Patient Account.");
 }
 
@@ -610,6 +607,7 @@ async function handleUserLogout() {
 }
 
 function switchTab(tabId) {
+  currentTab = tabId;
   document.querySelectorAll(".tab-view").forEach(el => el.classList.add("hidden"));
   document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
 
@@ -618,19 +616,27 @@ function switchTab(tabId) {
   if (targetView) targetView.classList.remove("hidden");
   if (targetNav) targetNav.classList.add("active");
 
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 
-  if (tabId === "dashboard") loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
-  if (tabId === "history") loadPatientHistory();
-  if (tabId === "trends") loadTrends();
-  if (tabId === "medications") loadMedications();
-  if (tabId === "diet") loadDiet();
-  if (tabId === "exercise") loadExercise();
-  if (tabId === "notifications") loadNotificationsView();
-  if (tabId === "profile") loadPatientProfile();
-  if (tabId === "settings") loadSettings();
+  if (tabId === "dashboard") {
+    loadDashboard();
+  } else if (tabId === "history") {
+    loadPatientHistory();
+  } else if (tabId === "trends") {
+    loadTrends();
+  } else if (tabId === "medications") {
+    loadMedications();
+  } else if (tabId === "diet") {
+    loadDiet();
+  } else if (tabId === "exercise") {
+    loadExercise();
+  } else if (tabId === "notifications") {
+    loadNotificationsView();
+  } else if (tabId === "profile") {
+    loadPatientProfile();
+  } else if (tabId === "settings") {
+    loadSettings();
+  }
 }
 
 function setupDragAndDrop() {
@@ -1265,8 +1271,7 @@ async function executeReportDeletion() {
       closeDeleteConfirmModal();
       await loadPatientHistory();
       await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
       await loadTrends();
       alert("✓ Report permanently deleted.");
     } else {
@@ -1297,8 +1302,7 @@ async function executeDeleteAllHistory() {
       closeDeleteAllConfirmModal();
       await loadPatientHistory();
       await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
       await loadTrends();
       alert("✓ All medical history has been cleared.");
     } else {
@@ -1882,8 +1886,7 @@ async function deleteSingleMedication(medId, brandName) {
       alert(`✓ ${brandName || "Medication"} deleted.`);
       await loadMedications();
       await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
     } else {
       alert("Failed to delete medication.");
     }
@@ -1903,8 +1906,7 @@ async function clearAllMedications() {
       alert("✓ All prescriptions cleared.");
       await loadMedications();
       await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
     } else {
       alert("Failed to clear prescriptions.");
     }
@@ -1930,8 +1932,7 @@ async function handlePrescriptionUpload(event) {
         alert("✓ Prescription document read and medicines added to your schedule!");
         loadMedications();
         loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
       }
     } catch (err) {
       console.error(err);
@@ -1951,8 +1952,7 @@ async function logMedAction(medId, schId, action) {
     if (res.ok) {
       loadMedications();
       loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
     }
   } catch (e) {
     console.error(e);
@@ -2440,8 +2440,7 @@ async function savePatientProfile() {
       alert("✓ Profile saved successfully!");
       loadPatientProfile();
       loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
     }
   } catch (e) {
     console.error(e);
@@ -2557,8 +2556,7 @@ async function submitNewMedication() {
       closeAddMedModal();
       await loadMedications();
       await loadDashboard();
-  loadNotificationFeed();
-  startBackgroundReminderChecker();
+  
       alert("✓ Prescription saved to your daily schedule!");
     }
   } catch (e) {
