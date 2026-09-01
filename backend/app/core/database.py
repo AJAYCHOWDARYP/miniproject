@@ -1,5 +1,6 @@
 """
 Database engine and async session provider.
+Optimized for Serverless Execution.
 """
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -23,8 +24,20 @@ AsyncSessionLocal = async_sessionmaker(
 
 Base = declarative_base()
 
+_db_initialized = False
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    global _db_initialized
+    if not _db_initialized:
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            _db_initialized = True
+        except Exception as e:
+            print(f"[INFO] DB lazy init: {e}")
+            _db_initialized = True
+
     async with AsyncSessionLocal() as session:
         try:
             yield session
