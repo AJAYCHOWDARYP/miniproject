@@ -1,8 +1,0 @@
-LABORATORY DIAGNOSTIC REPORT
-Patient Name: Eleanor Vance
-Age: 42 Years | Gender: Female | Weight: 68.5 kg
-Date: 2026-08-26
-Doctor: Dr. Mark Taylor
-
-Fasting Blood Glucose: 110.0 mg/dL (70.0 - 99.0 mg/dL)
-Total Cholesterol: 210.0 mg/dL (125.0 - 200.0 mg/dL)
